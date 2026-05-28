@@ -9,6 +9,7 @@
   "scripts": {
     "dev:backend": "pnpm --filter pizzarally-backend run start:dev",
     "dev:frontend": "pnpm --filter frontend run dev",
+    "start:backend": "pnpm --filter pizzarally-backend run start:prod",
     "build:backend": "pnpm --filter pizzarally-backend run build",
     "build:frontend": "pnpm --filter frontend run build",
     "build": "pnpm -r run build",
