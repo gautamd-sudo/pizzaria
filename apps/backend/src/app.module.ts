@@ -30,6 +30,7 @@ import { NotificationsModule } from './modules/notifications/notifications.modul
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
         uri: configService.get<string>('MONGODB_URI') || 'mongodb://localhost:27017/pizzarally',
+        dbName: 'pizzarally',
       }),
       inject: [ConfigService],
     }),
