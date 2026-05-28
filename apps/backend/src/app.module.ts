@@ -49,7 +49,10 @@ import { NotificationsModule } from './modules/notifications/notifications.modul
           }
         }
 
-        const host = configService.get<string>('REDIS_HOST') || 'localhost';
+        let host = configService.get<string>('REDIS_HOST') || 'localhost';
+        // Strip protocol prefix (e.g. https://) and trailing paths
+        host = host.replace(/^(https?|rediss?):\/\//i, '').split('/')[0].split(':')[0];
+
         const port = configService.get<number>('REDIS_PORT') || 6379;
         const password = configService.get<string>('REDIS_PASSWORD');
         const useTls = configService.get<boolean>('REDIS_TLS') || host.includes('upstash.io');
