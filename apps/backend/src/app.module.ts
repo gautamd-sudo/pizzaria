@@ -29,12 +29,40 @@ import { NotificationsModule } from './modules/notifications/notifications.modul
     }),
     BullModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => ({
-        connection: {
-          host: configService.get<string>('REDIS_HOST') || 'localhost',
-          port: configService.get<number>('REDIS_PORT') || 6379,
-        },
-      }),
+      useFactory: async (configService: ConfigService) => {
+        const url = configService.get<string>('REDIS_URL');
+        if (url) {
+          try {
+            const parsed = new URL(url);
+            const isTls = parsed.protocol === 'rediss:';
+            return {
+              connection: {
+                host: parsed.hostname,
+                port: parseInt(parsed.port || '6379', 10),
+                username: parsed.username || undefined,
+                password: parsed.password || undefined,
+                tls: isTls ? { rejectUnauthorized: false } : undefined,
+              },
+            };
+          } catch (e) {
+            // fallback if URL parsing fails
+          }
+        }
+
+        const host = configService.get<string>('REDIS_HOST') || 'localhost';
+        const port = configService.get<number>('REDIS_PORT') || 6379;
+        const password = configService.get<string>('REDIS_PASSWORD');
+        const useTls = configService.get<boolean>('REDIS_TLS') || host.includes('upstash.io');
+
+        return {
+          connection: {
+            host,
+            port,
+            password: password || undefined,
+            tls: useTls ? { rejectUnauthorized: false } : undefined,
+          },
+        };
+      },
       inject: [ConfigService],
     }),
     AuthModule,
